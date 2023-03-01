@@ -1,0 +1,28 @@
+#-------------------------
+# System Operation
+#-------------------------
+
+# OS X
+#-------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# windows
+#-------------------------
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+#-------------------------
+*~
+.Trash-*
+
+$RECYCLE.BIN/
+
+
+# Visual Studio Code
+#-------------------------
+.vscode/
