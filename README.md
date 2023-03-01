@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS Sales
 (
   id             INT           NOT NULL AUTO_INCREMENT,
   client_id      INT           NOT NULL,
-  observation    VARCHAR(255)  NOT NULL,
+  observation    VARCHAR(255)      NULL DEFAULT NULL,
   created_at     DATETIME      NOT NULL DEFAULT NOW(),
   updated_at     DATETIME          NULL DEFAULT NULL,
   status         BOOLEAN       NOT NULL DEFAULT TRUE,
@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS Purchases
 (
   id             INT                NOT NULL AUTO_INCREMENT,
   provider_id    INT                NOT NULL,
-  observation    VARCHAR(255)       NOT NULL,
+  observation    VARCHAR(255)           NULL DEFAULT NULL,
   created_at     DATETIME           NOT NULL DEFAULT NOW(),
   updated_at     DATETIME               NULL DEFAULT NULL,
   status         BOOLEAN            NOT NULL DEFAULT TRUE,
