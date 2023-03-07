@@ -1,10 +1,22 @@
-# Base de datos de Punto de venta
+# Point of Sale database
 
-## Modelo entidad relación
+Relational Model Design
 
-![Modelo entidad relación](docs/Model-E-R.png)
+## Relational Model
+
+![Relational Model](docs/Model-E-R.png)
 
 ## Script SQL
+
+Run Script using __mysqladmin__
+
+```bask
+mysqladmin -u <username> -p < path/to/script/sql
+```
+
+<details>
+
+<summary>Script SQL for MySQL</summary>
 
 ```sql
 --* -------------------------------------------------
@@ -201,3 +213,4 @@ INSERT INTO Warehouses (code, description) VALUES ('AG', 'Almacén general');
 INSERT INTO Clients (code, name) VALUES ('general', 'Cliente general');
 
 ```
+</details>
