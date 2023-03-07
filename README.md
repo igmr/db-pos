@@ -4,9 +4,13 @@ Relational Model Design
 
 ## Relational Model
 
-![Relational Model](docs/Model-E-R.png)
+![Relational Model](docs/Model.png)
 
 ## Script SQL
+
+<details>
+
+<summary>Script SQL for MySQL</summary>
 
 Run Script using __mysqladmin__
 
@@ -14,41 +18,40 @@ Run Script using __mysqladmin__
 mysqladmin -u <username> -p < path/to/script/sql
 ```
 
-<details>
-
-<summary>Script SQL for MySQL</summary>
+Script
 
 ```sql
---* -------------------------------------------------
---* Database pointSale
---* -------------------------------------------------
+
+-- * -------------------------------------------------
+-- * Database pointSale
+-- * -------------------------------------------------
 DROP DATABASE IF EXISTS pointSale;
 CREATE DATABASE IF NOT EXISTS pointSale;
 USE pointSale;
 
---* -------------------------------------------------
---* Table Users
---* -------------------------------------------------
+-- * -------------------------------------------------
+-- * Table Users
+-- * -------------------------------------------------
 DROP TABLE IF EXISTS Users;
 CREATE TABLE IF NOT EXISTS Users
 (
-  id         INT          NOT NULL AUTO_INCREMENT,
-  name       VARCHAR(45)  NOT NULL,
-  user       VARCHAR(45)  NOT NULL,
-  password   VARCHAR(45)  NOT NULL,
-  rol        VARCHAR(45)  NOT NULL DEFAULT 'ventas',
-  avatar     VARCHAR(255)     NULL DEFAULT NULL,
-  created_at DATETIME     NOT NULL DEFAULT NOW(),
-  updated_at DATETIME         NULL DEFAULT NULL,
-  status     BOOLEAN      NOT NULL DEFAULT TRUE,
-  CONSTRAINT pkUser       PRIMARY KEY(id),
-  CONSTRAINT ukUser       UNIQUE(user)
+  id           INT          NOT NULL AUTO_INCREMENT,
+  name         VARCHAR(45)  NOT NULL,
+  user         VARCHAR(45)  NOT NULL,
+  password     VARCHAR(45)  NOT NULL,
+  rol          VARCHAR(45)  NOT NULL DEFAULT 'ventas',
+  avatar       VARCHAR(255)     NULL DEFAULT NULL,
+  created_date TIMESTAMP     NOT NULL DEFAULT NOW(),
+  updated_date TIMESTAMP         NULL DEFAULT NULL,
+  status       BOOLEAN      NOT NULL DEFAULT TRUE,
+  CONSTRAINT   pkUser       PRIMARY KEY(id),
+  CONSTRAINT   ukUser       UNIQUE(user)
 );
---* -------------------------------------------------
---* Table Kardex
---* -------------------------------------------------
-DROP TABLE IF EXISTS Kardex;
-CREATE TABLE IF NOT EXISTS Kardex
+-- * -------------------------------------------------
+-- * Table Operations
+-- * -------------------------------------------------
+DROP TABLE IF EXISTS Operations;
+CREATE TABLE IF NOT EXISTS Operations
 (
   id             INT           NOT NULL AUTO_INCREMENT,
   operation_id   INT           NOT NULL DEFAULT 0,
@@ -59,21 +62,20 @@ CREATE TABLE IF NOT EXISTS Kardex
   price          DOUBLE        NOT NULL DEFAULT 0,
   tax            DOUBLE        NOT NULL DEFAULT 0,
   observation    VARCHAR(225)      NULL DEFAULT NULL,
-  created_at     DATETIME      NOT NULL DEFAULT NOW(),
-  updated_at     DATETIME         NULL DEFAULT NULL,
+  created_date   TIMESTAMP     NOT NULL DEFAULT NOW(),
+  updated_date   TIMESTAMP         NULL DEFAULT NULL,
   status         BOOLEAN       NOT NULL DEFAULT TRUE,
-  CONSTRAINT     pkKardex      PRIMARY KEY(id)
+  CONSTRAINT     pkOperation   PRIMARY KEY(id)
 );
---* -------------------------------------------------
---* Table Products
---* -------------------------------------------------
+-- * -------------------------------------------------
+-- * Table Products
+-- * -------------------------------------------------
 DROP TABLE IF EXISTS Products;
 CREATE TABLE IF NOT EXISTS Products
 (
   id             INT           NOT NULL AUTO_INCREMENT,
   code           VARCHAR(45)   NOT NULL,
   description    VARCHAR(65)   NOT NULL,
-  stock          INT           NOT NULL DEFAULT 0,
   price          DOUBLE        NOT NULL DEFAULT 0,
   unit           VARCHAR(45)   NOT NULL DEFAULT 'Pieza',
   product_type   VARCHAR(45)   NOT NULL DEFAULT 'producto'  COMMENT 'producto|servicio',
@@ -87,9 +89,9 @@ CREATE TABLE IF NOT EXISTS Products
   CONSTRAINT     pkProduct     PRIMARY KEY(id),
   CONSTRAINT     ukProduct     UNIQUE(code, description)
 );
---* -------------------------------------------------
---* Table Warehouses
---* -------------------------------------------------
+-- * -------------------------------------------------
+-- * Table Warehouses
+-- * -------------------------------------------------
 DROP TABLE IF EXISTS Warehouses;
 CREATE TABLE IF NOT EXISTS Warehouses
 (
@@ -97,75 +99,83 @@ CREATE TABLE IF NOT EXISTS Warehouses
   code           VARCHAR(45)   NOT NULL,
   description    VARCHAR(255)  NOT NULL,
   address        VARCHAR(255)      NULL DEFAULT NULL,
-  created_at     DATETIME      NOT NULL DEFAULT NOW(),
-  updated_at     DATETIME          NULL DEFAULT NULL,
+  created_date   TIMESTAMP     NOT NULL DEFAULT NOW(),
+  updated_date   TIMESTAMP         NULL DEFAULT NULL,
   status         BOOLEAN       NOT NULL DEFAULT TRUE,
   CONSTRAINT     pkWarehouse   PRIMARY KEY(id),
   CONSTRAINT     ukWarehouse   UNIQUE(code, description)
 );
---* -------------------------------------------------
---Table Clients
---* -------------------------------------------------
+-- * -------------------------------------------------
+-- * Table Clients
+-- * -------------------------------------------------
 DROP TABLE IF EXISTS Clients;
 CREATE TABLE IF NOT EXISTS Clients
 (
   id             INT           NOT NULL AUTO_INCREMENT,
   code           VARCHAR(45)   NOT NULL,
   name           VARCHAR(255)  NOT NULL,
-  created_at     DATETIME      NOT NULL DEFAULT NOW(),
-  updated_at     DATETIME          NULL DEFAULT NULL,
+  created_date   TIMESTAMP     NOT NULL DEFAULT NOW(),
+  updated_date   TIMESTAMP         NULL DEFAULT NULL,
   status         BOOLEAN       NOT NULL DEFAULT TRUE,
   CONSTRAINT     pkClient      PRIMARY KEY(id),
   CONSTRAINT     ukClient      UNIQUE(code)
 );
---* -------------------------------------------------
---* Table Providers
---* -------------------------------------------------
+-- * -------------------------------------------------
+-- * Table Providers
+-- * -------------------------------------------------
 DROP TABLE IF EXISTS Providers;
 CREATE TABLE IF NOT EXISTS Providers
 (
   id             INT           NOT NULL AUTO_INCREMENT,
   code           VARCHAR(45)   NOT NULL,
   name           VARCHAR(225)  NOT NULL,
-  created_at     DATETIME      NOT NULL DEFAULT NOW(),
-  updated_at     DATETIME          NULL DEFAULT NULL,
+  created_date   TIMESTAMP     NOT NULL DEFAULT NOW(),
+  updated_date   TIMESTAMP         NULL DEFAULT NULL,
   status         BOOLEAN       NOT NULL DEFAULT TRUE,
   CONSTRAINT     pkProvider    PRIMARY KEY(id),
   CONSTRAINT     ukProvider    UNIQUE(code)
 );
---* -------------------------------------------------
---* Table Sales
---* -------------------------------------------------
+-- * -------------------------------------------------
+-- * Table Sales
+-- * -------------------------------------------------
 DROP TABLE IF EXISTS Sales;
 CREATE TABLE IF NOT EXISTS Sales
 (
   id             INT           NOT NULL AUTO_INCREMENT,
   client_id      INT           NOT NULL,
+  sale_date      DATETIME      NOT NULL,
   observation    VARCHAR(255)      NULL DEFAULT NULL,
-  created_at     DATETIME      NOT NULL DEFAULT NOW(),
-  updated_at     DATETIME          NULL DEFAULT NULL,
+  subtotal       DOUBLE        NOT NULL DEFAULT 0,
+  taxes          DOUBLE        NOT NULL DEFAULT 0,
+  total          DOUBLE        NOT NULL DEFAULT 0,
+  created_date   TIMESTAMP     NOT NULL DEFAULT NOW(),
+  updated_date   TIMESTAMP         NULL DEFAULT NULL,
   status         BOOLEAN       NOT NULL DEFAULT TRUE,
   CONSTRAINT     pkSale        PRIMARY KEY(id),
   CONSTRAINT     fkSaleClient  FOREIGN KEY(client_id) REFERENCES Clients(id) ON DELETE CASCADE
 );
---* -------------------------------------------------
---* Table Purchase
---* -------------------------------------------------
+-- * -------------------------------------------------
+-- * Table Purchase
+-- * -------------------------------------------------
 DROP TABLE IF EXISTS Purchases;
 CREATE TABLE IF NOT EXISTS Purchases
 (
   id             INT                NOT NULL AUTO_INCREMENT,
   provider_id    INT                NOT NULL,
+  purchase_date  DATETIME           NOT NULL DEFAULT NOW(),
   observation    VARCHAR(255)           NULL DEFAULT NULL,
-  created_at     DATETIME           NOT NULL DEFAULT NOW(),
-  updated_at     DATETIME               NULL DEFAULT NULL,
+  subtotal       DOUBLE             NOT NULL DEFAULT 0,
+  taxes          DOUBLE             NOT NULL DEFAULT 0,
+  total          DOUBLE             NOT NULL DEFAULT 0,
+  created_date   TIMESTAMP          NOT NULL DEFAULT NOW(),
+  updated_date   TIMESTAMP              NULL DEFAULT NULL,
   status         BOOLEAN            NOT NULL DEFAULT TRUE,
   CONSTRAINT     pkPurchase         PRIMARY KEY(id),
   CONSTRAINT     fkPurchaseProvider FOREIGN KEY(provider_id) REFERENCES Providers(id) ON DELETE CASCADE
 );
---* -------------------------------------------------
---* Table SalesDetail
---* -------------------------------------------------
+-- * -------------------------------------------------
+-- * Table SalesDetail
+-- * -------------------------------------------------
 DROP TABLE IF EXISTS SalesDetail;
 CREATE TABLE IF NOT EXISTS SalesDetail
 (
@@ -176,17 +186,17 @@ CREATE TABLE IF NOT EXISTS SalesDetail
   quantity       DOUBLE                 NOT NULL DEFAULT 0,
   price          DOUBLE                 NOT NULL DEFAULT 0,
   tax            DOUBLE                 NOT NULL DEFAULT 0,
-  created_at     DATETIME               NOT NULL DEFAULT NOW(),
-  updated_at     DATETIME                   NULL DEFAULT NULL,
+  created_date   TIMESTAMP              NOT NULL DEFAULT NOW(),
+  updated_date   TIMESTAMP                  NULL DEFAULT NULL,
   canceled       BOOLEAN                NOT NULL DEFAULT FALSE,
   CONSTRAINT     pkSaleDetail           PRIMARY KEY(id),
   CONSTRAINT     fkSaleDetailSale       FOREIGN KEY(sale_id) REFERENCES Sales(id) ON DELETE CASCADE,
   CONSTRAINT     fkSaleDetailProduct    FOREIGN KEY(product_id) REFERENCES Products(id) ON DELETE CASCADE,
   CONSTRAINT     fkSaleDetailWarehouse  FOREIGN KEY(warehouse_id) REFERENCES Warehouses(id) ON DELETE CASCADE
 );
---* -------------------------------------------------
---* Table PurchasesDetail
---* -------------------------------------------------
+-- * -------------------------------------------------
+-- * Table PurchasesDetail
+-- * -------------------------------------------------
 DROP TABLE IF EXISTS PurchasesDetail;
 CREATE TABLE IF NOT EXISTS PurchasesDetail
 (
@@ -197,8 +207,8 @@ CREATE TABLE IF NOT EXISTS PurchasesDetail
   quantity       DOUBLE                     NOT NULL DEFAULT 0,
   price          DOUBLE                     NOT NULL DEFAULT 0,
   tax            DOUBLE                     NOT NULL DEFAULT 0,
-  created_at     DATETIME                   NOT NULL DEFAULT NOW(),
-  updated_at     DATETIME                       NULL DEFAULT NULL,
+  created_date   TIMESTAMP                  NOT NULL DEFAULT NOW(),
+  updated_date   TIMESTAMP                      NULL DEFAULT NULL,
   canceled       BOOLEAN                    NOT NULL DEFAULT FALSE,
   CONSTRAINT     pkPurchaseDetail           PRIMARY KEY(id),
   CONSTRAINT     fkPurchaseDetailPurchase   FOREIGN KEY(purchase_id) REFERENCES Purchases(id) ON DELETE CASCADE,
@@ -206,11 +216,12 @@ CREATE TABLE IF NOT EXISTS PurchasesDetail
   CONSTRAINT     fkPurchaseDetailWarehouse  FOREIGN KEY(warehouse_id) REFERENCES Warehouses(id) ON DELETE CASCADE
 );
 
---* -------------------------------------------------
---* Inserts
---* -------------------------------------------------
+-- * -------------------------------------------------
+-- * Inserts
+-- * -------------------------------------------------
 INSERT INTO Warehouses (code, description) VALUES ('AG', 'Almacén general');
 INSERT INTO Clients (code, name) VALUES ('general', 'Cliente general');
 
 ```
+
 </details>
